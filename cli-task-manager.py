@@ -22,20 +22,36 @@ def read_args() -> List[str]:
     args: List[str] = sys.argv
     if len(args) > 4:
         print("To many argument remember to quote around string")
+        exit()
     return args
 
 def check_action(args: List[str], file_path):
+
     match(args[1]):
         case "-add":
+           if len(args) > 3:
+               print("Usage: python3 -m cli-task-manager.py -add 'task title'")
            return add_task(file_path, args[2])
         case "-remove":
+            if len(args) > 3:
+               print("Usage: python3 -m cli-task-manager.py -remove 1")
             return remove_task(file_path, args[2])
         case "-update":
+            if len(args) > 4:
+               print("Usage: python3 -m cli-task-manager.py -update 1 'task title'")
             return update_task(file_path, args[2], args[3])
         case "-show":
+            if len(args) > 2:
+               print("Usage: python3 -m cli-task-manager.py -show")
             return show_task(file_path)
         case "-complete":
+            if len(args) > 3:
+               print("Usage: python3 -m cli-task-manager.py -complete 2")
             return complete_task(file_path, args[2])
+        case "-help":
+            if len(args) > 2:
+               print("Usage: python3 -m cli-task-manager.py -help")
+            return help()
         case _:
             return "python3 -m cli-task-manager.py [-add, -remove, -update, -show] []"
 
@@ -54,7 +70,7 @@ def add_task(file_path, new_task):
     with open(file_path, "r") as file:
         data = json.load(file)
 
-    task = Task(sys.argv, new_task)
+    task = Task(new_task)
 
     data["tasks"].append(task.to_dict())
 
@@ -66,6 +82,10 @@ def remove_task(file_path, id: str):
 
     with open(file_path, "r") as file:
         data = json.load(file)
+    
+    if int(id) > len(data["tasks"]):
+        print("id not valid")
+        exit()
     
     for task in data["tasks"]:
         if task["id"] != id:
@@ -84,6 +104,10 @@ def update_task(file_path, id, new_task):
     with open(file_path, "r") as file:
         data = json.load(file)
 
+    if int(id) > len(data["tasks"]):
+        print("id not valid")
+        exit()
+
     for task in data["tasks"]:
         if task["id"] == f"{id}":
             task["title"] = new_task
@@ -99,6 +123,10 @@ def complete_task(file_path, id):
     with open(file_path, "r") as file:
         data = json.load(file)
     
+    if int(id) > len(data["tasks"]):
+        print("id not valid")
+        exit()
+
     for task in data["tasks"]:
         if task["id"] == f"{id}":
             task["completed"] = "True"
@@ -107,16 +135,21 @@ def complete_task(file_path, id):
     with open(file_path, "w") as file:
         json.dump({"tasks": new_list},file)
 
+def help():
+    print("Task Manager CLI - Available Commands:")
+    print("------------------------------------------------")
+    print("python3 -m cli-task-manager.py -add 'task title'    : Adds a new task with the given title.")
+    print("python3 -m cli-task-manager.py -remove <task_id>    : Removes the task with the specified ID.")
+    print("python3 -m cli-task-manager.py -update <task_id> 'new title' : Updates the title of the task with the specified ID.")
+    print("python3 -m cli-task-manager.py -show                 : Shows all tasks in the task manager.")
+    print("python3 -m cli-task-manager.py -complete <task_id>   : Marks the task with the specified ID as complete.")
+    print("python3 -m cli-task-manager.py -help                 : Displays this help message.")
+    print("------------------------------------------------")
+
+
 
 
 if __name__ == "__main__":
     main()
-#1. be able to add new task 
-#2. only be able to do one thing at a time 
-#3. show progress when something is changed or option is given
-#4. be able to edit a task on the list 
-#5. be able to delete task on a list 
-#6. store all data in json file.
-#7 lists should be always odd as every opotion should have a matching description 
-# of sorts plus the file argument
+
 

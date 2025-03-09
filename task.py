@@ -3,7 +3,7 @@ import json
 
 
 class Task:
-    def __init__(self, args, title, completed="False"):
+    def __init__(self, title, completed="False"):
         with open("data/task.json", "r") as file:
             data = json.load(file)
         
